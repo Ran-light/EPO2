@@ -59,10 +59,10 @@ int main(int argc, char const *argv[]) {
     }
 
     maze_init(input_len, input_list);
-    print_matrix();
+    //print_matrix();
     
     Lee(input_len,stationinput);
-    print_matrix();
+    //print_matrix();
     
     //print route
 
@@ -77,6 +77,7 @@ int main(int argc, char const *argv[]) {
 
 void Lee (int list_len, int *stationinput) {
     int count = 1;
+    int n=0;        /*is used for indexing the route array*/
     int m=0;        /*keeps track of index in update_array*/
     int p=0;        /*keeps track of index in update_array_new*/
     
@@ -86,10 +87,11 @@ void Lee (int list_len, int *stationinput) {
     update_array[0] = stations[stationinput[nr_of_stations-1]-1];
     *update_array[0] = count;
     
-    
     /*expand fase*/
     while(*stations[stationinput[0]-1]==0) {
+        
         ++count;                                             /*gives higher value to consecutive neighbours*/
+        
         while(update_array[m]!=NULL) {
             
             /*right neighbour*/
@@ -123,13 +125,11 @@ void Lee (int list_len, int *stationinput) {
             m++;
         }
         
-        
         /*makes update_array ready for transfer of update_array_new, also makes m=0*/
         while(m>0) {
             update_array[m-1] = NULL;
             m--;
         }
-        
         
         /*transfers update_array_new to update_array, and empties it for new content*/
         while(p>0) {
@@ -145,13 +145,70 @@ void Lee (int list_len, int *stationinput) {
         
     }
     
-    /*
-     .make a loop inside the for loop. Have **update_array that stores all neigbouring available adresses. Let the loop loop through
-     all the adresses in the array and update the array with the available neighbours of all those adresses.
-     */
-    /* also implementation possible with struct then?
-     left, update U, check neighbours C, set flag S, right(back), right, UCS, left(back), above, UCS, below(back), below, UCS, above(back).
-     */
+    print_matrix();
+    
+    /*Trace back fase*/
+    update_array[0] = stations[stationinput[0]-1];      /*repurposing of update_array for current and visited location*/
+    update_array_new[0] = update_array[0];              /*repurposing of update_array_new for updating update_array*/
+    m=0;    /*only for clarification, should already be 0*/
+    
+    while(update_array[m]!=stations[stationinput[nr_of_stations-1]-1]) {
+        /*right neighbour*/
+        if((*(update_array[m]+1)<*(update_array[m]))&&(*(update_array[m]+1)>0)) {
+            update_array_new[0] = update_array[m]+1;
+        }
+        
+        /*left neighbour*/
+        else if((*(update_array[m]-1)<*(update_array[m]))&&(*(update_array[m]-1)>0)) {
+            update_array_new[0] = update_array[m]-1;
+        }
+        
+        /*above neighbour*/
+        else if(((*(update_array[m]-13)<*(update_array[m]))&&(update_array[m]-13>*maze))&&(*(update_array[m]-13)>0)) {
+            update_array_new[0] = update_array[m]-13;
+        }
+        
+        /*below neighbour*/
+        else if((*(update_array[m]+13)<*(update_array[m]))&&(update_array[m]+13<*maze+169)&&(*(update_array[m]+13)>0)) {
+            update_array_new[0] = update_array[m]+13;
+        }
+        
+        else {
+            fputs("Error! No path was found between these stations!\n",stderr);
+            exit(1);
+        }
+        
+        m++;
+        update_array[m] = update_array_new[0];
+        
+        }
+    
+        /*building the route array*/
+        route = (int*)calloc(count,sizeof(int));
+        
+        for(n=count-1;n>=0;n--) {
+            for(m=0;m<5;m++) {
+                for(p=0;p<5;p++) {
+                    
+                    //test
+                    printf("n: %i,  m: %i,  p: %i\n",n,m,p);
+                    
+                    
+                    /*this piece doesn't work*/
+                    if(update_array[n] == crossings[m][p]) {
+                        *(route+count-n-1) = (10*m)+p;
+                    }
+                    
+                    
+                    
+                }
+            }
+        }
+        
+        /*test*/
+        for(n=0;n<count;n++) {
+            printf("%i   %i\n", *update_array[n], route[n]);
+        }
     
 
     /*
