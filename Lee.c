@@ -20,6 +20,45 @@
  Treasure hunt: a new mine is placed, which has to be found in an as short as possible time.
 */
 
+/*pseudocode of instructions to the robot
+ n = 0
+ m = 0
+ 
+ if (crossing_sensor = 1) {
+    current_location = route[n]
+    n++
+ 
+    if(route[n] = left of current crossing) {
+        instruction = left
+    else if (route[n] = right of current crossing) {
+        instruction = right
+    else
+        instruction = straight on
+    }
+ }
+ 
+ if (mine_sensor = 1) {
+    input_list[m] = current_location(2 numbers) + instruction (letter)      add to input list options for north and west?
+    maze_init()
+    Lee()
+    m++
+    n--
+    instruction = back
+ }
+ */
+
+/*pseudocode for more stations
+ try for all combinations of stations:
+    lee() with station list of first 2 stations
+    lee() with station list of station 2 and 3
+    """ station 3 and 4         and so on
+    concatenate routes
+ search for shortest concatenation of routes
+ 
+ is this too slow? C is pretty fast...
+ */
+
+
 void maze_init (int list_len, int* block_list);
 void print_matrix (void);
 void Lee (int list_len, int *stationinput);
@@ -39,6 +78,9 @@ int main(int argc, char const *argv[]) {
     int *stationinput;   /*list with stations to visit, beginning at station 0*/
     int n;  /*temporary variable*/
 
+    /*needed for xcode, remove!*/
+    getchar();
+    
     /*first input, gives input list length*/
     scanf("%i",&input_len);
 
@@ -50,7 +92,7 @@ int main(int argc, char const *argv[]) {
     for(n=0; n<(3*input_len); ++n) {
         /*reads the characters*/
         if(!((n+1)%3)) {
-            /*reads \n*/
+            /*reads \n or space */
             getchar();
             /*reads needed char*/
             input_list[n] = (int)getchar();
@@ -197,9 +239,14 @@ void Lee (int list_len, int *stationinput) {
     /*print route*/
     print_matrix();
     puts("\n");
-    for(n=0;n<count;n++) {
-        if(route[n]!=0) {
-            printf("c%i ", route[n]);
+    for(n=1;n<count-1;n++) {
+        if(!(n%2)) {
+            if(route[n]>=10) {
+                printf("c%i ", route[n]);
+            }
+            else {
+                printf("c0%i ", route[n]);
+            }
         }
     }
     puts("\n");
