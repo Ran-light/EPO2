@@ -1,6 +1,25 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/*challenge a:
+ The list with stations is given, no blocked edges.
+ 
+ challenge b:
+ The list with stations is given. Some part has to keep track of the position of the robot.
+ When a mine is detected, a blocked edge must be given to the algorithm together with the already
+ existing blocked edges and stations, with the starting station at the current location (which isn't
+ a classical station but an edge). Then the journey can continue.
+ 
+ a and b are implementable when a way of working with several stations is found. Besides that, of course communication with X-CTU or
+ the self-made C program (prefered) has to be made, a way to funnel the sensor inputs into the algorithm (should not be too difficult)
+ and a way to send instructions to the robot determined by current location and the algorithm.
+ 
+ challenge c: (not yet implementable)
+ Exploration:
+ The robot has to traverse the entire field (except station entries) in an as short as possible timespan. Everytime a mine is encountered it has to be entered again in the algorithm (but for the algorithm stations have to be given so it will have to be changed??)
+ Treasure hunt: a new mine is placed, which has to be found in an as short as possible time.
+*/
+
 void maze_init (int list_len, int* block_list);
 void print_matrix (void);
 void Lee (int list_len, int *stationinput);
@@ -13,17 +32,6 @@ int **update_array_new;
 int *route;
 
 const int nr_of_stations = 2;
-
-/* experimental
-typedef struct statcross{
-    int loci;   /*row*/
-    /*int locj;   /*column*/
-    /*struct statcross *right;
-    struct statcross *left;
-    struct statcross *above;
-    struct statcross *below;
-}statcross;*/
-
 
 int main(int argc, char const *argv[]) {
     int input_len;
@@ -59,19 +67,11 @@ int main(int argc, char const *argv[]) {
     }
 
     maze_init(input_len, input_list);
-    //print_matrix();
     
     Lee(input_len,stationinput);
-    //print_matrix();
-    
-    //print route
 
     free(input_list);
     free(stationinput);
-    /*free(maze);
-    free(stations);
-    free(crossings); should all not be needed*/
-    free(route);
     return 0;
 }
 
@@ -145,8 +145,6 @@ void Lee (int list_len, int *stationinput) {
         
     }
     
-    print_matrix();
-    
     /*Trace back fase*/
     update_array[0] = stations[stationinput[0]-1];      /*repurposing of update_array for current and visited location*/
     update_array_new[0] = update_array[0];              /*repurposing of update_array_new for updating update_array*/
@@ -181,53 +179,35 @@ void Lee (int list_len, int *stationinput) {
         m++;
         update_array[m] = update_array_new[0];
         
-        }
+    }
     
-        /*building the route array*/
-        route = (int*)calloc(count,sizeof(int));
-        
-        for(n=count-1;n>=0;n--) {
-            for(m=0;m<5;m++) {
-                for(p=0;p<5;p++) {
-                    
-                    //test
-                    printf("n: %i,  m: %i,  p: %i\n",n,m,p);
-                    
-                    
-                    /*this piece doesn't work*/
-                    if(update_array[n] == crossings[m][p]) {
-                        *(route+count-n-1) = (10*m)+p;
-                    }
-                    
-                    
-                    
+    /*building the route array*/
+    route = (int*)calloc(count,sizeof(int));
+    
+    for(n=0;n<count;n++) {
+        for(m=0;m<5;m++) {
+            for(p=0;p<5;p++) {
+                if(update_array[n] == crossings[m][p]) {
+                    *(route+n) = (10*m)+p;
                 }
             }
         }
-        
-        /*test*/
-        for(n=0;n<count;n++) {
-            printf("%i   %i\n", *update_array[n], route[n]);
-        }
+    }
     
-
-    /*
-    i = 1;      (Expand)
-    Mark target cell with value i
-    while (start cell not yet marked with value > 0) {
-    Mark all neighbor cells of cells marked with i, with i+1,
-    if they have a value 0.
-    i = i+1
+    /*print route*/
+    print_matrix();
+    puts("\n");
+    for(n=0;n<count;n++) {
+        if(route[n]!=0) {
+            printf("c%i ", route[n]);
+        }
     }
-    Go to the start cell        (Trace back)
-    while (target cell not yet reached) {
-    Go to a neighbor cell that has a lower value.
-    }
-    */
-
-    /*as output the route global pointer has to be allocated and given a value*/
+    puts("\n");
+    
+    /*free allocated memory*/
     free(update_array);
     free(update_array_new);
+    free(route);
 }
 
 void maze_init (int list_len, int* block_list) {
@@ -252,15 +232,8 @@ void maze_init (int list_len, int* block_list) {
             }
         }
     }
-
+    
     /*blocked edges*/
-
-    /*prints input list, can be removed
-    for(i=0; i<(3*list_len); ++i) {
-    printf("%i ",block_list[i]);
-    }
-    printf("\n\n");*/
-
     for(k=0; k<list_len; ++k) {
         i = 2*block_list[3*k] + 2;            /*row*/
         j = 2*block_list[3*k+1] +2;           /*column*/
@@ -272,7 +245,7 @@ void maze_init (int list_len, int* block_list) {
         }
         maze[i][j] = -1;
     }
-
+    
     /*storing locations of the stations inside an array*/
     stations[0]  = &maze[12][4];    /*location of station 1 in maze*/
     stations[1]  = &maze[12][6];
@@ -287,31 +260,14 @@ void maze_init (int list_len, int* block_list) {
     stations[10] = &maze[6][0];
     stations[11] = &maze[8][0];    /*station 12*/
     
-    /*prints adresses in stations, + a test, can be removed
-    for(i=0;i<12;i++) {
-        printf("%p\n",stations[i]);
-        if(i==1) {
-           printf("%p\n",stations[i]+1);
-        }
-    }*/
-    
-    
     /*storing locations of the crossings inside a matrix*/
     for(i=0;i<5;i++) {
         for(j=0;j<5;++j) {
-            k = 2+2i;
-            m = 2+2j;
+            k = 2+2*i;
+            m = 2+2*j;
             crossings[i][j] = &maze[k][m];
         }
     }
-    
-    /*prints content of crossings (zeros), can be removed
-    for(i=0;i<5;i++) {
-        for(j=0;j<5;++j) {
-            printf("%i",*crossings[i][j]);
-        }
-    }*/
-    
 }
 
 void print_matrix (void) {
