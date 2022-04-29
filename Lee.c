@@ -1,64 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-/*challenge a:
- The list with stations is given, no blocked edges.
- 
- challenge b:
- The list with stations is given. Some part has to keep track of the position of the robot.
- When a mine is detected, a blocked edge must be given to the algorithm together with the already
- existing blocked edges and stations, with the starting station at the current location (which isn't
- a classical station but an edge). Then the journey can continue.
- 
- a and b are implementable when a way of working with several stations is found. Besides that, of course communication with X-CTU or
- the self-made C program (prefered) has to be made, a way to funnel the sensor inputs into the algorithm (should not be too difficult)
- and a way to send instructions to the robot determined by current location and the algorithm.
- 
- challenge c: (not yet implementable)
- Exploration:
- The robot has to traverse the entire field (except station entries) in an as short as possible timespan. Everytime a mine is encountered it has to be entered again in the algorithm (but for the algorithm stations have to be given so it will have to be changed??)
- Treasure hunt: a new mine is placed, which has to be found in an as short as possible time.
-*/
-
-/*pseudocode of instructions to the robot
- n = 0
- m = 0
- 
- if (crossing_sensor = 1) {
-    current_location = route[n]
-    n++
- 
-    if(route[n] = left of current crossing) {
-        instruction = left
-    else if (route[n] = right of current crossing) {
-        instruction = right
-    else
-        instruction = straight on
-    }
- }
- 
- if (mine_sensor = 1) {
-    input_list[m] = current_location(2 numbers) + instruction (letter)      add to input list options for north and west?
-    maze_init()
-    Lee()
-    m++
-    n--
-    instruction = back
- }
- */
-
-/*pseudocode for more stations
- try for all combinations of stations:
-    lee() with station list of first 2 stations
-    lee() with station list of station 2 and 3
-    """ station 3 and 4         and so on
-    concatenate routes
- search for shortest concatenation of routes
- 
- is this too slow? C is pretty fast...
- */
-
-
 void maze_init (int list_len, int* block_list);
 void print_matrix (void);
 void Lee (int list_len, int *stationinput);
@@ -74,9 +16,9 @@ const int nr_of_stations = 2;
 
 int main(int argc, char const *argv[]) {
     int input_len;
-    int *input_list; /*list with blocked edges*/
+    int *input_list;     /*list with blocked edges*/
     int *stationinput;   /*list with stations to visit, beginning at station 0*/
-    int n;  /*temporary variable*/
+    int n;               /*temporary variable*/
 
     /*needed for xcode, remove!*/
     getchar();
@@ -123,7 +65,7 @@ void Lee (int list_len, int *stationinput) {
     int m=0;        /*keeps track of index in update_array*/
     int p=0;        /*keeps track of index in update_array_new*/
     
-    update_array = (int**)calloc(30,sizeof(int*)); /*what size? 20 is maximum I found, 30 is for security*/
+    update_array = (int**)calloc(30,sizeof(int*));          /*what size? 20 is maximum I found, 30 is for security*/
     update_array_new = (int**)calloc(30,sizeof(int*));
     
     update_array[0] = stations[stationinput[nr_of_stations-1]-1];
