@@ -9,7 +9,9 @@
 #define BAUDRATE CBR_9600
 
 
-    int done = 0;
+int done = 0;
+extern int end_instruction;
+extern int instruction[2];
 
 void initSio(HANDLE hSerial){
 
@@ -81,7 +83,7 @@ int writeByte(HANDLE hSerial, int *buffWrite){
     return(0);
 }
 
-int main()
+int zigbee()
 {
     HANDLE hSerial;
 
@@ -125,7 +127,7 @@ int main()
 
     done = 1;
 
-    return 0;
-
     CloseHandle(hSerial);
+
+    return 0;
 }
