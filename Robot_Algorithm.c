@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 #include "Robot_Header.h"
@@ -49,18 +48,8 @@
  }
  */
 
-/*pseudocode for more stations
- try for all combinations of stations:
- lee() with station list of first 2 stations
- lee() with station list of station 2 and 3
- """ station 3 and 4         and so on
- concatenate routes
- search for shortest concatenation of routes
-
- is this too slow? C is pretty fast...
- */
-
 void Lee (int list_len, int *stationinput);
+void shortest_route(int *stationinput);
 void maze_init (int list_len, int* block_list);
 void print_matrix (void);
 
@@ -71,8 +60,11 @@ int **update_array;
 int **update_array_new;
 int *route;
 
+extern int done;
 int end_instruction = 0;
 int instruction[2] = {0,0};
+
+int zigbee(void);
 
 const int nr_of_stations = 2;
 
@@ -113,15 +105,35 @@ int main(int argc, char const *argv[]) {
 
     Lee(input_len,stationinput);
 
-    end_instruction = 1;
+    shortest_route(stationinput);
 
-    if (done == 1) {
-        printf("ZIGBEE IO DONE!\n");
-    }
+    /*not working in Code::Blocks, why????????*/
+    //end_instruction = 1;
+
+    //zigbee();
+
+    //if (done == 1) {
+    //    printf("ZIGBEE IO DONE!\n");
+    //}
+    /*:(*/
 
     free(input_list);
     free(stationinput);
     return 0;
+}
+
+void shortest_route(int *stationinput) {
+    /*pseudocode for more stations
+ try for all combinations of stations:
+ lee() with station list of first 2 stations
+ lee() with station list of station 2 and 3
+ """ station 3 and 4         and so on
+ concatenate routes
+ search for shortest concatenation of routes
+
+ is this too slow? C is pretty fast...
+ */
+ puts("test");
 }
 
 void Lee (int list_len, int *stationinput) {
