@@ -107,15 +107,14 @@ int main(int argc, char const *argv[]) {
 
     shortest_route(stationinput);
 
-    /*not working in Code::Blocks, why????????*/
-    //end_instruction = 1;
+    end_instruction = 1;
 
-    //zigbee();
+    zigbee();
 
-    //if (done == 1) {
-    //    printf("ZIGBEE IO DONE!\n");
-    //}
-    /*:(*/
+    if (done == 1) {
+        printf("ZIGBEE IO DONE!\n");
+    }
+
 
     free(input_list);
     free(stationinput);

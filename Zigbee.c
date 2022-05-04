@@ -119,6 +119,7 @@ int zigbee()
 
     while ( 1 ) {
         if (end_instruction == 1) // end the loop with a separate instruction
+            puts("jallah");
             break;
 
         writeByte(hSerial, instruction);
